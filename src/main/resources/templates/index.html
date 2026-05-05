@@ -1,9 +1,90 @@
 <!DOCTYPE html>
-<html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
 <head>
-    <title>Home</title>
+    <meta charset="UTF-8">
+    <title>Personal Task Manager</title>
 </head>
 <body>
-<h1>This is the home page</h1>
+<h1>Personal Task Manager</h1>
+
+<h2>Add a new task</h2>
+
+<form th:action="@{/tasks}" th:object="${newTask}" method="post">
+    <div>
+        <label for="title">Title</label>
+        <input id="title" type="text" th:field="*{title}" placeholder="Task title">
+    </div>
+
+    <div>
+        <label for="description">Description</label>
+        <input id="description" type="text" th:field="*{description}" placeholder="Task description">
+    </div>
+
+    <div>
+        <label for="priority">Priority</label>
+        <select id="priority" th:field="*{priority}">
+            <option th:each="priority : ${priorities}"
+                    th:value="${priority}"
+                    th:text="${priority}">
+            </option>
+        </select>
+    </div>
+
+    <div>
+        <label for="dueDate">Due date</label>
+        <input id="dueDate" type="date" th:field="*{dueDate}">
+    </div>
+
+    <button type="submit">Add Task</button>
+</form>
+
+<hr>
+
+<h2>Tasks</h2>
+
+<div>
+    <a th:href="@{/}">All</a>
+
+    <span th:each="status : ${statuses}">
+            |
+            <a th:href="@{/(status=${status})}" th:text="${status}"></a>
+        </span>
+</div>
+
+<div th:if="${tasks.isEmpty()}">
+    <p>No tasks yet.</p>
+</div>
+
+<div th:each="task : ${tasks}">
+    <hr>
+
+    <h3 th:text="${task.title}">Task title</h3>
+
+    <p th:text="${task.description}">Task description</p>
+
+    <p>
+        Priority:
+        <strong th:text="${task.priority}">Priority</strong>
+    </p>
+
+    <p>
+        Status:
+        <strong th:text="${task.status}">Status</strong>
+    </p>
+
+    <p>
+        Due:
+        <span th:text="${task.dueDate}">Due date</span>
+    </p>
+
+    <form th:action="@{/tasks/{id}/complete(id=${task.id})}" method="post"
+          th:if="${task.status.name() != 'COMPLETED'}">
+        <button type="submit">Complete</button>
+    </form>
+
+    <form th:action="@{/tasks/{id}/delete(id=${task.id})}" method="post">
+        <button type="submit">Delete</button>
+    </form>
+</div>
 </body>
 </html>
