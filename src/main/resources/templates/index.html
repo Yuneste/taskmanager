@@ -3,95 +3,97 @@
 <head>
     <meta charset="UTF-8">
     <title>Personal Task Manager</title>
+    <link rel="stylesheet" th:href="@{/style.css}">
 </head>
 <body>
-<h1>Personal Task Manager</h1>
+<div class="container">
+    <h1>Personal Task Manager</h1>
 
-<h2>Add a new task</h2>
+    <div class="card">
+        <h2>Add a new task</h2>
 
-<form th:action="@{/tasks}" th:object="${newTask}" method="post">
-    <div>
-        <label for="title">Title</label>
-        <input id="title" type="text" th:field="*{title}" placeholder="Task title">
-        <p th:if="${#fields.hasErrors('title')}" th:errors="*{title}"></p>
+        <form th:action="@{/tasks}" th:object="${newTask}" method="post">
+            <div class="form-group">
+                <label for="title">Title</label>
+                <input id="title" type="text" th:field="*{title}" placeholder="Task title">
+                <p class="error" th:if="${#fields.hasErrors('title')}" th:errors="*{title}"></p>
+            </div>
+
+            <div class="form-group">
+                <label for="description">Description</label>
+                <input id="description" type="text" th:field="*{description}" placeholder="Task description">
+            </div>
+
+            <div class="form-group">
+                <label for="priority">Priority</label>
+                <select id="priority" th:field="*{priority}">
+                    <option th:each="priority : ${priorities}"
+                            th:value="${priority}"
+                            th:text="${priority}">
+                    </option>
+                </select>
+                <p class="error" th:if="${#fields.hasErrors('priority')}" th:errors="*{priority}"></p>
+            </div>
+
+            <div class="form-group">
+                <label for="dueDate">Due date</label>
+                <input id="dueDate" type="date" th:field="*{dueDate}">
+                <p class="error" th:if="${#fields.hasErrors('dueDate')}" th:errors="*{dueDate}"></p>
+            </div>
+
+            <button type="submit">Add Task</button>
+        </form>
     </div>
 
-    <div>
-        <label for="description">Description</label>
-        <input id="description" type="text" th:field="*{description}" placeholder="Task description">
+    <div class="card">
+        <h2>Tasks</h2>
+
+        <div class="filters">
+            <a th:href="@{/}">All</a>
+
+            <span th:each="status : ${statuses}">
+                <a th:href="@{/(status=${status})}" th:text="${status}"></a>
+            </span>
+        </div>
+
+        <div th:if="${tasks.isEmpty()}">
+            <p>No tasks yet.</p>
+        </div>
+
+        <div class="card" th:each="task : ${tasks}">
+            <h3 th:text="${task.title}">Task title</h3>
+
+            <p th:text="${task.description}">Task description</p>
+
+            <p>
+                Priority:
+                <span class="badge" th:text="${task.priority}">Priority</span>
+            </p>
+
+            <p>
+                Status:
+                <span class="badge" th:text="${task.status}">Status</span>
+            </p>
+
+            <p>
+                Due:
+                <span th:text="${task.dueDate}">Due date</span>
+            </p>
+
+            <div class="task-actions">
+                <a class="button-link" th:href="@{/tasks/{id}/edit(id=${task.id})}">Edit</a>
+
+                <form th:action="@{/tasks/{id}/complete(id=${task.id})}" method="post"
+                      th:if="${task.status.name() != 'COMPLETED'}">
+                    <button class="success" type="submit">Complete</button>
+                </form>
+
+                <form th:action="@{/tasks/{id}/delete(id=${task.id})}" method="post">
+                    <button class="danger" type="submit">Delete</button>
+                </form>
+            </div>
+        </div>
     </div>
-
-    <div>
-        <label for="priority">Priority</label>
-        <select id="priority" th:field="*{priority}">
-            <option th:each="priority : ${priorities}"
-                    th:value="${priority}"
-                    th:text="${priority}">
-            </option>
-        </select>
-        <p th:if="${#fields.hasErrors('priority')}" th:errors="*{priority}"></p>
-    </div>
-
-    <div>
-        <label for="dueDate">Due date</label>
-        <input id="dueDate" type="date" th:field="*{dueDate}">
-        <p th:if="${#fields.hasErrors('dueDate')}" th:errors="*{dueDate}"></p>
-    </div>
-
-    <button type="submit">Add Task</button>
-</form>
-
-<hr>
-
-<h2>Tasks</h2>
-
-<div>
-    <a th:href="@{/}">All</a>
-
-    <span th:each="status : ${statuses}">
-            |
-            <a th:href="@{/(status=${status})}" th:text="${status}"></a>
-        </span>
-</div>
-
-<div th:if="${tasks.isEmpty()}">
-    <p>No tasks yet.</p>
-</div>
-
-<div th:each="task : ${tasks}">
-    <hr>
-
-    <h3 th:text="${task.title}">Task title</h3>
-
-    <p th:text="${task.description}">Task description</p>
-
-    <p>
-        Priority:
-        <strong th:text="${task.priority}">Priority</strong>
-    </p>
-
-    <p>
-        Status:
-        <strong th:text="${task.status}">Status</strong>
-    </p>
-
-    <p>
-        Due:
-        <span th:text="${task.dueDate}">Due date</span>
-    </p>
-
-    <p>
-        <a th:href="@{/tasks/{id}/edit(id=${task.id})}">Edit</a>
-    </p>
-
-    <form th:action="@{/tasks/{id}/complete(id=${task.id})}" method="post"
-          th:if="${task.status.name() != 'COMPLETED'}">
-        <button type="submit">Complete</button>
-    </form>
-
-    <form th:action="@{/tasks/{id}/delete(id=${task.id})}" method="post">
-        <button type="submit">Delete</button>
-    </form>
 </div>
 </body>
 </html>
