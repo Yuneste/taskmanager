@@ -3,6 +3,7 @@ package com.yunes.taskmanager.controller;
 import com.yunes.taskmanager.model.Task;
 import com.yunes.taskmanager.model.TaskPriority;
 import com.yunes.taskmanager.model.TaskStatus;
+import com.yunes.taskmanager.repository.TaskRepository;
 import com.yunes.taskmanager.service.TaskService;
 import jakarta.validation.Valid;
 import org.springframework.stereotype.Controller;
@@ -14,9 +15,11 @@ import org.springframework.web.bind.annotation.*;
 public class HomeController {
 
     private final TaskService taskService;
+    private final TaskRepository taskRepository;
 
-    public HomeController(TaskService taskService) {
+    public HomeController(TaskService taskService, TaskRepository taskRepository) {
         this.taskService = taskService;
+        this.taskRepository = taskRepository;
     }
 
     @GetMapping("/")
@@ -24,7 +27,10 @@ public class HomeController {
             @RequestParam(required = false) TaskStatus status,
             Model model
     ) {
-        addHomePageData(model, status, new Task());
+        Task newTask = new Task();
+        newTask.setPriority(TaskPriority.MEDIUM);
+
+        addHomePageData(model, status, newTask);
         return "index";
     }
 
@@ -51,7 +57,8 @@ public class HomeController {
 
     @PostMapping("/tasks/{id}/delete")
     public String deleteTask(@PathVariable Long id) {
-        taskService.deleteTask(id);
+        Task task = taskService.findTaskById(id);
+        taskRepository.delete(task);
         return "redirect:/";
     }
 

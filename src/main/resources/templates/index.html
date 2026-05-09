@@ -77,7 +77,13 @@
 
             <p>
                 Due:
-                <span th:text="${task.dueDate}">Due date</span>
+                <span th:if="${task.dueDate != null}" th:text="${task.dueDate}">Due date</span>
+                <span th:if="${task.dueDate == null}">No due date</span>
+            </p>
+
+            <p>
+                Created:
+                <span th:text="${#temporals.format(task.createdAt, 'yyyy-MM-dd HH:mm')}">Created date</span>
             </p>
 
             <div class="task-actions">
