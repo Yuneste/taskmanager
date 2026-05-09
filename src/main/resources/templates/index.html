@@ -80,6 +80,10 @@
         <span th:text="${task.dueDate}">Due date</span>
     </p>
 
+    <p>
+        <a th:href="@{/tasks/{id}/edit(id=${task.id})}">Edit</a>
+    </p>
+
     <form th:action="@{/tasks/{id}/complete(id=${task.id})}" method="post"
           th:if="${task.status.name() != 'COMPLETED'}">
         <button type="submit">Complete</button>

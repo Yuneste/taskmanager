@@ -9,6 +9,19 @@ import java.util.List;
 
 @Service
 public class TaskService {
+
+    public Task updateTask(Long id, Task updatedTask) {
+        Task existingTask = findTaskById(id);
+
+        existingTask.setTitle(updatedTask.getTitle());
+        existingTask.setDescription(updatedTask.getDescription());
+        existingTask.setPriority(updatedTask.getPriority());
+        existingTask.setStatus(updatedTask.getStatus());
+        existingTask.setDueDate(updatedTask.getDueDate());
+
+        return taskRepository.save(existingTask);
+    }
+
     private final TaskRepository taskRepository;
 
     public TaskService(TaskRepository taskRepository) {

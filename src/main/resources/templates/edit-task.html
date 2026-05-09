@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Edit Task</title>
+</head>
+<body>
+<h1>Edit Task</h1>
+
+<form th:action="@{/tasks/{id}/edit(id=${task.id})}" th:object="${task}" method="post">
+    <div>
+        <label for="title">Title</label>
+        <input id="title" type="text" th:field="*{title}">
+        <p th:if="${#fields.hasErrors('title')}" th:errors="*{title}"></p>
+    </div>
+
+    <div>
+        <label for="description">Description</label>
+        <input id="description" type="text" th:field="*{description}">
+    </div>
+
+    <div>
+        <label for="priority">Priority</label>
+        <select id="priority" th:field="*{priority}">
+            <option th:each="priority : ${priorities}"
+                    th:value="${priority}"
+                    th:text="${priority}">
+            </option>
+        </select>
+        <p th:if="${#fields.hasErrors('priority')}" th:errors="*{priority}"></p>
+    </div>
+
+    <div>
+        <label for="status">Status</label>
+        <select id="status" th:field="*{status}">
+            <option th:each="status : ${statuses}"
+                    th:value="${status}"
+                    th:text="${status}">
+            </option>
+        </select>
+    </div>
+
+    <div>
+        <label for="dueDate">Due date</label>
+        <input id="dueDate" type="date" th:field="*{dueDate}">
+        <p th:if="${#fields.hasErrors('dueDate')}" th:errors="*{dueDate}"></p>
+    </div>
+
+    <button type="submit">Save Changes</button>
+</form>
+
+<p>
+    <a th:href="@{/}">Back to tasks</a>
+</p>
+</body>
+</html>

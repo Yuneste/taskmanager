@@ -55,6 +55,34 @@ public class HomeController {
         return "redirect:/";
     }
 
+    @GetMapping("/tasks/{id}/edit")
+    public String showEditForm(@PathVariable Long id, Model model) {
+        Task task = taskService.findTaskById(id);
+
+        model.addAttribute("task", task);
+        model.addAttribute("priorities", TaskPriority.values());
+        model.addAttribute("statuses", TaskStatus.values());
+
+        return "edit-task";
+    }
+
+    @PostMapping("/tasks/{id}/edit")
+    public String updateTask(
+            @PathVariable Long id,
+            @Valid @ModelAttribute("task") Task task,
+            BindingResult bindingResult,
+            Model model
+    ) {
+        if (bindingResult.hasErrors()) {
+            model.addAttribute("priorities", TaskPriority.values());
+            model.addAttribute("statuses", TaskStatus.values());
+            return "edit-task";
+        }
+
+        taskService.updateTask(id, task);
+        return "redirect:/";
+    }
+
     private void addHomePageData(Model model, TaskStatus status, Task newTask) {
         if (status == null) {
             model.addAttribute("tasks", taskService.findAllTasks());
