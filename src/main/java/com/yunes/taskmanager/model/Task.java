@@ -1,6 +1,10 @@
 package com.yunes.taskmanager.model;
 
 import jakarta.persistence.*;
+import jakarta.validation.constraints.FutureOrPresent;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
+
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 
@@ -46,16 +50,19 @@ public class Task {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    @NotBlank(message = "Title is required")
     private String title;
 
     private String description;
 
+    @NotNull(message = "Priority is required")
     @Enumerated(EnumType.STRING)
     private TaskPriority priority;
 
     @Enumerated(EnumType.STRING)
     private TaskStatus status;
 
+    @FutureOrPresent(message = "Due date cannot be in the past")
     private LocalDate dueDate;
 
     private LocalDateTime createdAt;

@@ -13,6 +13,7 @@
     <div>
         <label for="title">Title</label>
         <input id="title" type="text" th:field="*{title}" placeholder="Task title">
+        <p th:if="${#fields.hasErrors('title')}" th:errors="*{title}"></p>
     </div>
 
     <div>
@@ -28,11 +29,13 @@
                     th:text="${priority}">
             </option>
         </select>
+        <p th:if="${#fields.hasErrors('priority')}" th:errors="*{priority}"></p>
     </div>
 
     <div>
         <label for="dueDate">Due date</label>
         <input id="dueDate" type="date" th:field="*{dueDate}">
+        <p th:if="${#fields.hasErrors('dueDate')}" th:errors="*{dueDate}"></p>
     </div>
 
     <button type="submit">Add Task</button>
