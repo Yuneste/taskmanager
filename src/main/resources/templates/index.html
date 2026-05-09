@@ -6,100 +6,170 @@
     <link rel="stylesheet" th:href="@{/style.css}">
 </head>
 <body>
-<div class="container">
-    <h1>Personal Task Manager</h1>
+<div class="page-shell">
 
-    <div class="card">
-        <h2>Add a new task</h2>
-
-        <form th:action="@{/tasks}" th:object="${newTask}" method="post">
-            <div class="form-group">
-                <label for="title">Title</label>
-                <input id="title" type="text" th:field="*{title}" placeholder="Task title">
-                <p class="error" th:if="${#fields.hasErrors('title')}" th:errors="*{title}"></p>
-            </div>
-
-            <div class="form-group">
-                <label for="description">Description</label>
-                <input id="description" type="text" th:field="*{description}" placeholder="Task description">
-            </div>
-
-            <div class="form-group">
-                <label for="priority">Priority</label>
-                <select id="priority" th:field="*{priority}">
-                    <option th:each="priority : ${priorities}"
-                            th:value="${priority}"
-                            th:text="${priority}">
-                    </option>
-                </select>
-                <p class="error" th:if="${#fields.hasErrors('priority')}" th:errors="*{priority}"></p>
-            </div>
-
-            <div class="form-group">
-                <label for="dueDate">Due date</label>
-                <input id="dueDate" type="date" th:field="*{dueDate}">
-                <p class="error" th:if="${#fields.hasErrors('dueDate')}" th:errors="*{dueDate}"></p>
-            </div>
-
-            <button type="submit">Add Task</button>
-        </form>
-    </div>
-
-    <div class="card">
-        <h2>Tasks</h2>
-
-        <div class="filters">
-            <a th:href="@{/}">All</a>
-
-            <span th:each="status : ${statuses}">
-                <a th:href="@{/(status=${status})}" th:text="${status}"></a>
-            </span>
+    <section class="hero">
+        <div class="hero-panel">
+            <span class="eyebrow">Task workspace</span>
+            <h1>Plan your day with focus.</h1>
+            <p class="hero-copy">
+                Create, organize, complete, and track your tasks in one clean workspace.
+            </p>
         </div>
 
-        <div th:if="${tasks.isEmpty()}">
-            <p>No tasks yet.</p>
-        </div>
-
-        <div class="card" th:each="task : ${tasks}">
-            <h3 th:text="${task.title}">Task title</h3>
-
-            <p th:text="${task.description}">Task description</p>
-
-            <p>
-                Priority:
-                <span class="badge" th:text="${task.priority}">Priority</span>
-            </p>
-
-            <p>
-                Status:
-                <span class="badge" th:text="${task.status}">Status</span>
-            </p>
-
-            <p>
-                Due:
-                <span th:if="${task.dueDate != null}" th:text="${task.dueDate}">Due date</span>
-                <span th:if="${task.dueDate == null}">No due date</span>
-            </p>
-
-            <p>
-                Created:
-                <span th:text="${#temporals.format(task.createdAt, 'yyyy-MM-dd HH:mm')}">Created date</span>
-            </p>
-
-            <div class="task-actions">
-                <a class="button-link" th:href="@{/tasks/{id}/edit(id=${task.id})}">Edit</a>
-
-                <form th:action="@{/tasks/{id}/complete(id=${task.id})}" method="post"
-                      th:if="${task.status.name() != 'COMPLETED'}">
-                    <button class="success" type="submit">Complete</button>
-                </form>
-
-                <form th:action="@{/tasks/{id}/delete(id=${task.id})}" method="post">
-                    <button class="danger" type="submit">Delete</button>
-                </form>
+        <div class="stats-panel">
+            <div class="stat-box">
+                <span class="stat-number" th:text="${tasks.size()}">0</span>
+                <span class="stat-label">Tasks currently shown</span>
+            </div>
+            <div class="stat-box">
+                <span class="stat-number" th:text="${selectedStatus == null ? 'All' : selectedStatus}">All</span>
+                <span class="stat-label">Current filter</span>
             </div>
         </div>
-    </div>
+    </section>
+
+    <main class="layout-grid">
+        <section class="card">
+            <div class="card-header">
+                <h2 class="card-title">Create task</h2>
+                <p class="card-subtitle">Add a clear task with priority and an optional due date.</p>
+            </div>
+
+            <form th:action="@{/tasks}" th:object="${newTask}" method="post">
+                <div class="form-group">
+                    <label for="title">Title</label>
+                    <input id="title" type="text" th:field="*{title}" placeholder="Example: Study Spring Boot">
+                    <p class="error" th:if="${#fields.hasErrors('title')}" th:errors="*{title}"></p>
+                </div>
+
+                <div class="form-group">
+                    <label for="description">Description</label>
+                    <input id="description" type="text" th:field="*{description}" placeholder="Short note about the task">
+                </div>
+
+                <div class="form-group">
+                    <label for="priority">Priority</label>
+                    <select id="priority" th:field="*{priority}">
+                        <option th:each="priority : ${priorities}"
+                                th:value="${priority}"
+                                th:text="${priority}">
+                        </option>
+                    </select>
+                    <p class="error" th:if="${#fields.hasErrors('priority')}" th:errors="*{priority}"></p>
+                </div>
+
+                <div class="form-group">
+                    <label for="dueDate">Due date</label>
+                    <input id="dueDate" type="date" th:field="*{dueDate}">
+                    <p class="error" th:if="${#fields.hasErrors('dueDate')}" th:errors="*{dueDate}"></p>
+                </div>
+
+                <button class="primary-button" type="submit">Add Task</button>
+            </form>
+        </section>
+
+        <section class="card">
+            <div class="card-header">
+                <h2 class="card-title">Your tasks</h2>
+                <p class="card-subtitle">Filter your list or update tasks as you move through the day.</p>
+            </div>
+
+            <div class="filters">
+                <a class="filter-link" th:href="@{/}">All</a>
+
+                <a class="filter-link"
+                   th:each="status : ${statuses}"
+                   th:href="@{/(status=${status})}"
+                   th:text="${status}">
+                </a>
+            </div>
+
+            <div class="empty-state" th:if="${tasks.isEmpty()}">
+                <p>No tasks here yet.</p>
+            </div>
+
+            <div class="task-list" th:if="${!tasks.isEmpty()}">
+                <article class="task-card" th:each="task : ${tasks}">
+                    <div class="task-title-row">
+                        <div>
+                            <h3 class="task-title" th:text="${task.title}">Task title</h3>
+                            <p class="task-description" th:if="${task.description != null and !task.description.isBlank()}"
+                               th:text="${task.description}">
+                                Task description
+                            </p>
+
+                            <p class="task-description" th:if="${task.description == null or task.description.isBlank()}">
+                                No description added.
+                            </p>
+                        </div>
+                    </div>
+
+                    <div class="task-meta">
+                        <span class="badge badge-status-open"
+                              th:if="${task.status.name() == 'OPEN'}"
+                              th:text="${task.status}">
+                            Status
+                        </span>
+
+                                                <span class="badge badge-status-in-progress"
+                                                      th:if="${task.status.name() == 'IN_PROGRESS'}"
+                                                      th:text="${task.status}">
+                            Status
+                        </span>
+
+                                                <span class="badge badge-status-completed"
+                                                      th:if="${task.status.name() == 'COMPLETED'}"
+                                                      th:text="${task.status}">
+                            Status
+                        </span>
+
+                        <span class="badge badge-priority-low"
+                              th:if="${task.priority.name() == 'LOW'}"
+                              th:text="${task.priority}">
+                            Priority
+                        </span>
+
+                                                <span class="badge badge-priority-medium"
+                                                      th:if="${task.priority.name() == 'MEDIUM'}"
+                                                      th:text="${task.priority}">
+                            Priority
+                        </span>
+
+                                                <span class="badge badge-priority-high"
+                                                      th:if="${task.priority.name() == 'HIGH'}"
+                                                      th:text="${task.priority}">
+                            Priority
+                        </span>
+
+                        <span class="badge badge-status-open">
+                            Due:
+                            <span th:if="${task.dueDate != null}" th:text="${task.dueDate}">Due date</span>
+                            <span th:if="${task.dueDate == null}">No due date</span>
+                        </span>
+
+                        <span class="badge badge-status-open">
+                            Created:
+                            <span th:text="${#temporals.format(task.createdAt, 'yyyy-MM-dd HH:mm')}">Created date</span>
+                        </span>
+                    </div>
+
+                    <div class="task-actions">
+                        <a class="button-link" th:href="@{/tasks/{id}/edit(id=${task.id})}">Edit</a>
+
+                        <form th:action="@{/tasks/{id}/complete(id=${task.id})}" method="post"
+                              th:if="${task.status.name() != 'COMPLETED'}">
+                            <button class="success" type="submit">Complete</button>
+                        </form>
+
+                        <form th:action="@{/tasks/{id}/delete(id=${task.id})}" method="post">
+                            <button class="danger" type="submit">Delete</button>
+                        </form>
+                    </div>
+                </article>
+            </div>
+        </section>
+    </main>
 </div>
 </body>
 </html>
